@@ -1,0 +1,95 @@
+<section id="contact">
+        <div class="container">
+            <h2 class="text-center mb-5">Get In Touch</h2>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-md-6 mb-4 mb-md-0" data-aos="fade-right">
+                    <h4 class="mb-4">Let's Connect!</h4>
+                    <p class="mb-4">
+                        I'm always open to discussing new opportunities, interesting projects,
+                        or just having a friendly chat about technology.
+                    </p>
+
+                    {% if contact_info %}
+                    <div class="mb-4">
+                        <h6><i class="fas fa-envelope me-2 text-primary"></i> Email</h6>
+                        <p>{{ contact_info.email }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6><i class="fas fa-phone me-2 text-primary"></i> Phone</h6>
+                        <p>{{ contact_info.phone }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6><i class="fas fa-map-marker-alt me-2 text-primary"></i> Location</h6>
+                        <p>{{ contact_info.location }}</p>
+                    </div>
+
+                    <div class="social-links">
+                        {% if contact_info.github_url %}
+                        <a href="{{ contact_info.github_url }}" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if contact_info.linkedin_url %}
+                        <a href="{{ contact_info.linkedin_url }}" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if contact_info.telegram_url %}
+                        <a href="{{ contact_info.telegram_url }}" target="_blank">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if contact_info.facebook_url %}
+                        <a href="{{ contact_info.facebook_url }}" target="_blank">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                        <div class="col-md-6" data-aos="fade-left">
+                           {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-success">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+
+                            <form method="POST" id="contactForm">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="email" name="email" class="form-control" placeholder="Your Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" name="subject" class="form-control" placeholder="Subject" required>
+                                </div>
+                                <div class="mb-3">
+                                    <textarea name="message" class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </form>
+
+                            <div id="formMessage" class="mt-3 text-center"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

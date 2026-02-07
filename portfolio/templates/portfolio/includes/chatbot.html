@@ -1,0 +1,762 @@
+<!-- chatbot.html -->
+<button id="chatbot-toggle" class="chatbot-toggle-btn">
+    <span class="chatbot-icon">💬</span>
+    <span class="chatbot-notification"></span>
+</button>
+
+<!-- Chatbot Container -->
+<div id="chatbot" class="chatbot-container hidden">
+    <!-- Chat Header -->
+    <div class="chatbot-header">
+        <div class="chatbot-header-left">
+            <div class="chatbot-avatar">🤖</div>
+            <div class="chatbot-header-info">
+                <div class="chatbot-title">AI Assistant</div>
+                <div class="chatbot-status">Online • Typically replies instantly</div>
+            </div>
+        </div>
+        <div class="chatbot-header-right">
+            <button class="chatbot-header-btn minimize-btn" title="Minimize">−</button>
+            <button class="chatbot-header-btn close-btn" title="Close">×</button>
+        </div>
+    </div>
+
+    <!-- Chat Messages Area -->
+    <div id="chatbot-messages" class="chatbot-messages">
+        <!-- Welcome Message -->
+        <div class="message-row message-row-bot">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <div class="message-bubble message-bubble-bot">
+                    Hello! I'm your AI assistant. How can I help you today?
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+
+        <!-- Chat history will be loaded here -->
+        {% for msg in chat_history %}
+        <div class="message-row message-row-{{ msg.sender }}">
+            {% if msg.sender == 'bot' %}
+            <div class="message-avatar">🤖</div>
+            {% endif %}
+            <div class="message-content">
+                <div class="message-bubble message-bubble-{{ msg.sender }}">
+                    {{ msg.message }}
+                </div>
+                <div class="message-time">{{ msg.time|default:"Just now" }}</div>
+            </div>
+            {% if msg.sender == 'user' %}
+            <div class="message-avatar message-avatar-user">👤</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <!-- Auto-scroll indicator -->
+        <div id="scroll-to-bottom" class="scroll-to-bottom hidden">
+            <button class="scroll-to-bottom-btn" title="Scroll to latest messages">
+                ↓
+            </button>
+        </div>
+    </div>
+
+    <!-- Chat Input Area -->
+    <div class="chatbot-input-area">
+        <div class="typing-indicator hidden">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span class="typing-text">AI is typing...</span>
+        </div>
+        <div class="input-wrapper">
+            <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Type a message..."
+                autocomplete="off">
+            <button id="chatbot-send" class="send-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+        <div class="chatbot-footer">
+            <small>AI can make mistakes. Consider checking important information.</small>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Main Styles */
+    .chatbot-container {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 380px;
+        height: 600px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .chatbot-container.hidden {
+        transform: translateY(20px);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Toggle Button */
+    .chatbot-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 999;
+    }
+
+    .chatbot-toggle-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .chatbot-toggle-btn .chatbot-icon {
+        font-size: 24px;
+    }
+
+    .chatbot-notification {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        background: #ff4757;
+        border-radius: 50%;
+        border: 2px solid white;
+        display: none;
+    }
+
+    /* Chat Header */
+    .chatbot-header {
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chatbot-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .chatbot-avatar {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .chatbot-header-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chatbot-title {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .chatbot-status {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    .chatbot-header-right {
+        display: flex;
+        gap: 8px;
+    }
+
+    .chatbot-header-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+    .chatbot-header-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Messages Area */
+    .chatbot-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+    }
+
+    .message-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        max-width: 100%;
+    }
+
+    .message-row-user {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .message-avatar-user {
+        background: #667eea;
+        color: white;
+    }
+
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 70%;
+    }
+
+    .message-bubble {
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+
+    .message-bubble-bot {
+        background: white;
+        color: #333;
+        border: 1px solid #e0e0e0;
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-bubble-user {
+        background: #667eea;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-time {
+        font-size: 11px;
+        color: #6c757d;
+        margin-top: 4px;
+        padding: 0 8px;
+    }
+
+    /* Input Area */
+    .chatbot-input-area {
+        padding: 16px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .typing-indicator.hidden {
+        display: none;
+    }
+
+    .typing-dots {
+        display: flex;
+        gap: 4px;
+    }
+
+    .typing-dots span {
+        width: 6px;
+        height: 6px;
+        background: #6c757d;
+        border-radius: 50%;
+        animation: typingBounce 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .typing-dots span:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @keyframes typingBounce {
+        0%, 80%, 100% {
+            transform: scale(0);
+        }
+        40% {
+            transform: scale(1);
+        }
+    }
+
+    .input-wrapper {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .chatbot-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 24px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .chatbot-input:focus {
+        border-color: #667eea;
+    }
+
+    .send-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #667eea;
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+    .send-btn:not(:disabled):hover {
+        background: #5a67d8;
+    }
+
+    .send-btn:disabled {
+        background: #e0e0e0;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .chatbot-footer {
+        margin-top: 8px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 11px;
+    }
+
+    /* Scrollbar Styling */
+    .chatbot-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Auto-scroll indicator */
+    .scroll-to-bottom {
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        padding: 10px 0;
+        background: linear-gradient(to bottom, transparent, #f8f9fa 50%);
+        z-index: 1;
+    }
+
+    .scroll-to-bottom.hidden {
+        display: none;
+    }
+
+    .scroll-to-bottom-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease;
+        opacity: 0.9;
+    }
+
+    .scroll-to-bottom-btn:hover {
+        background: #5a67d8;
+        transform: scale(1.1);
+        opacity: 1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+        .chatbot-container {
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+            right: 0;
+            border-radius: 0;
+        }
+
+        .chatbot-toggle-btn {
+            bottom: 10px;
+            right: 10px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const chatbot = document.getElementById('chatbot');
+        const toggleBtn = document.getElementById('chatbot-toggle');
+        const sendBtn = document.getElementById('chatbot-send');
+        const input = document.getElementById('chatbot-input');
+        const messagesContainer = document.getElementById('chatbot-messages');
+        const closeBtn = document.querySelector('.close-btn');
+        const minimizeBtn = document.querySelector('.minimize-btn');
+        const typingIndicator = document.querySelector('.typing-indicator');
+        const scrollToBottomBtn = document.querySelector('.scroll-to-bottom');
+        const scrollToBottomButton = document.querySelector('.scroll-to-bottom-btn');
+
+        // Auto-scroll variables
+        let isAutoScrollEnabled = true;
+        let scrollCheckTimeout = null;
+
+        // Initialize auto-scroll
+        initializeAutoScroll();
+
+        // Toggle chatbot visibility
+        toggleBtn.addEventListener('click', () => {
+            chatbot.classList.toggle('hidden');
+            if (!chatbot.classList.contains('hidden')) {
+                input.focus();
+                // Auto-scroll to bottom when opening
+                setTimeout(() => {
+                    smoothScrollToBottom();
+                }, 100);
+            }
+        });
+
+        // Close chatbot
+        closeBtn.addEventListener('click', () => {
+            chatbot.classList.add('hidden');
+        });
+
+        // Minimize chatbot
+        minimizeBtn.addEventListener('click', () => {
+            chatbot.classList.add('hidden');
+        });
+
+        // Scroll to bottom button click
+        scrollToBottomButton.addEventListener('click', () => {
+            smoothScrollToBottom();
+            scrollToBottomBtn.classList.add('hidden');
+        });
+
+        // Enable/disable send button based on input
+        input.addEventListener('input', () => {
+            sendBtn.disabled = input.value.trim() === '';
+        });
+
+        // Send message on Enter key
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!sendBtn.disabled) {
+                    sendMessage();
+                }
+            }
+        });
+
+        // Send message function
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Initialize auto-scroll functionality
+        function initializeAutoScroll() {
+            // Set initial scroll position to bottom
+            smoothScrollToBottom();
+            
+            // Add scroll event listener
+            messagesContainer.addEventListener('scroll', handleScroll);
+            
+            // Add wheel event for better detection
+            messagesContainer.addEventListener('wheel', () => {
+                checkScrollPosition();
+            });
+            
+            // Add touch events for mobile
+            messagesContainer.addEventListener('touchstart', () => {
+                isAutoScrollEnabled = false;
+                checkScrollPosition();
+            });
+            
+            messagesContainer.addEventListener('touchend', () => {
+                // Re-enable auto-scroll after a delay if user stops touching
+                setTimeout(checkScrollPosition, 1000);
+            });
+        }
+
+        // Handle scroll events
+        function handleScroll() {
+            if (scrollCheckTimeout) {
+                clearTimeout(scrollCheckTimeout);
+            }
+            
+            scrollCheckTimeout = setTimeout(() => {
+                checkScrollPosition();
+            }, 150);
+        }
+
+        // Check scroll position and show/hide scroll button
+        function checkScrollPosition() {
+            const scrollHeight = messagesContainer.scrollHeight;
+            const scrollTop = messagesContainer.scrollTop;
+            const clientHeight = messagesContainer.clientHeight;
+            
+            // Check if user is near the bottom (within 100px)
+            const isNearBottom = scrollHeight - scrollTop - clientHeight <= 100;
+            
+            if (isNearBottom) {
+                // User is near bottom, enable auto-scroll
+                isAutoScrollEnabled = true;
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                // User has scrolled up, disable auto-scroll
+                isAutoScrollEnabled = false;
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        }
+
+        // Smooth scroll to bottom
+        function smoothScrollToBottom() {
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+            isAutoScrollEnabled = true;
+            scrollToBottomBtn.classList.add('hidden');
+        }
+
+        // Auto-scroll to bottom if enabled
+        function autoScrollToBottom() {
+            if (isAutoScrollEnabled) {
+                smoothScrollToBottom();
+            } else {
+                // Show scroll indicator if not at bottom
+                checkScrollPosition();
+            }
+        }
+
+        async function sendMessage() {
+            const userMsg = input.value.trim();
+            if (!userMsg) return;
+
+            // Add user message
+            addMessage(userMsg, 'user');
+            input.value = '';
+            sendBtn.disabled = true;
+
+            // Show typing indicator
+            typingIndicator.classList.remove('hidden');
+            
+            // Auto-scroll after user message
+            setTimeout(() => {
+                autoScrollToBottom();
+            }, 50);
+
+            try {
+                const response = await fetch("{% url 'chatbot' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: new URLSearchParams({
+                        message: userMsg
+                    })
+                });
+
+                const data = await response.json();
+
+                // Hide typing indicator
+                typingIndicator.classList.add('hidden');
+
+                // Add bot response
+                if (data.message) {
+                    addMessage(data.message, 'bot');
+                    
+                    // Auto-scroll after bot response
+                    setTimeout(() => {
+                        autoScrollToBottom();
+                    }, 100);
+                    
+                    // If there's a notification, show it
+                    if (data.type === 'notification') {
+                        showNotification(data.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                typingIndicator.classList.add('hidden');
+                addMessage('Sorry, there was an error processing your request. Please try again.', 'bot');
+                
+                // Auto-scroll after error
+                setTimeout(() => {
+                    autoScrollToBottom();
+                }, 100);
+            }
+        }
+
+        // Enhanced message display with better formatting
+        function addMessage(text, sender) {
+            const messageRow = document.createElement('div');
+            messageRow.className = `message-row message-row-${sender}`;
+
+            const timestamp = new Date().toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Format text with line breaks for better readability
+            const formattedText = text.replace(/\n/g, '<br>');
+
+            messageRow.innerHTML = `
+                ${sender === 'bot' ? '<div class="message-avatar">🤖</div>' : ''}
+                <div class="message-content">
+                    <div class="message-bubble message-bubble-${sender}">
+                        ${escapeHtml(text).replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="message-time">${timestamp}</div>
+                </div>
+                ${sender === 'user' ? '<div class="message-avatar message-avatar-user">👤</div>' : ''}
+            `;
+
+            messagesContainer.appendChild(messageRow);
+            
+            // Check scroll position after adding message
+            setTimeout(() => {
+                checkScrollPosition();
+            }, 50);
+        }
+
+        // Function to show notification on toggle button
+        function showNotification(message) {
+            const notification = document.querySelector('.chatbot-notification');
+            notification.style.display = 'block';
+            notification.title = message;
+
+            // Auto-hide notification after 5 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-focus input when chatbot opens
+        input.addEventListener('focus', () => {
+            setTimeout(() => {
+                autoScrollToBottom();
+            }, 200);
+        });
+
+        // Auto-scroll when resizing window
+        window.addEventListener('resize', () => {
+            if (!chatbot.classList.contains('hidden')) {
+                setTimeout(() => {
+                    checkScrollPosition();
+                }, 300);
+            }
+        });
+
+        // Initialize scroll position on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                autoScrollToBottom();
+            }, 500);
+        });
+
+        // Add click handler to messages area to potentially re-enable auto-scroll
+        messagesContainer.addEventListener('click', (e) => {
+            // If clicking near the bottom, re-enable auto-scroll
+            const rect = messagesContainer.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            
+            if (clickY > rect.height - 100) {
+                isAutoScrollEnabled = true;
+                scrollToBottomBtn.classList.add('hidden');
+            }
+        });
+    });
+</script>

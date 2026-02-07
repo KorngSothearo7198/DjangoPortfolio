@@ -1,0 +1,742 @@
+{% load static %}
+
+<section id="hero" class="position-relative overflow-hidden">
+    <!-- Background Elements -->
+    <div class="hero-bg-elements">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+        <div class="bg-shape shape-4"></div>
+        <div class="bg-blur"></div>
+    </div>
+
+
+
+    <div class="container position-relative z-2">
+        <div class="row align-items-center min-vh-90 py-5">
+            <div class="col-lg-6 text-lg-start text-center mb-5 mb-lg-0" data-aos="fade-right">
+                <!-- Main Heading -->
+                <h1 class="hero-title mb-4">
+                    Hi, I'm <span class="gradient-text">{{ profile.full_name }}</span>
+                    <span class="wave-hand">👋</span>
+                </h1>
+
+                <!-- Subtitle -->
+                <h2 class="hero-subtitle mb-4">
+                    <span class="typing-text">{{ profile.short_title }}</span>
+                    <span class="typed-cursor">|</span>
+                </h2>
+
+                <!-- Description -->
+                <p class="hero-description mb-5">
+                    {{ profile.description }}
+                </p>
+
+                <!-- CTA Buttons -->
+                <div class="hero-buttons d-flex flex-wrap gap-3 justify-content-lg-start justify-content-center">
+                    <a href="#projects" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket me-2"></i> View Projects
+                    </a>
+                    <a href="#contact" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i> Hire Me
+                    </a>
+                    {% if profile.cv_file %}
+                    <a href="{{ profile.cv_file.url }}" class="btn btn-outline-light btn-lg" target="_blank">
+                        <i class="fas fa-download me-2"></i> Download CV
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Profile Image Column -->
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                <div class="profile-container">
+                    <div class="profile-image-wrapper">
+                       {% if profile.profile_image %}
+                        <img src="{{ profile.profile_image.url }}" alt="{{ profile.full_name }}" class="profile-img">
+                        {% else %}
+                        <img src="{% static 'images/default-profile.png' %}" alt="Default Profile" class="profile-img">
+                        {% endif %}
+                        <!-- Example Floating Badges -->
+                        <div class="floating-badge projects">
+                            <div class="badge-content">
+                                <i class="fas fa-code"></i>
+                                <span>Mobile </span>
+                            </div>
+                        </div>
+
+                        <div class="floating-badge tech">
+                            <div class="badge-content">
+                                <i class="fas fa-laptop-code"></i>
+                                <span>Full Stack</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tech Stack Icons -->
+                    <div class="tech-stack mt-5">
+                        <p class="text-center mb-3">Tech Stack</p>
+                        <div class="stack-icons d-flex justify-content-center flex-wrap gap-4">
+                            {% for tech in tech_stacks %}
+                            <div class="tech-icon" data-tooltip="{{ tech.name }}">
+                                <i class="{{ tech.icon_class }} fa-2x"></i>
+                                <small>{{ tech.name }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <a href="#about" class="scroll-link">
+            <span class="mouse">
+                <span class="wheel"></span>
+            </span>
+            <span class="scroll-text">Scroll Down</span>
+        </a>
+    </div>
+</section>
+
+<style>
+    /* Hero Section Base */
+    #hero {
+        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Background Elements */
+    .hero-bg-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-color), transparent);
+        opacity: 0.1;
+    }
+
+    .bg-shape.shape-1 {
+        width: 300px;
+        height: 300px;
+        top: -150px;
+        right: -100px;
+        background: linear-gradient(45deg, #667eea, transparent);
+    }
+
+    .bg-shape.shape-2 {
+        width: 200px;
+        height: 200px;
+        bottom: 100px;
+        left: -50px;
+        background: linear-gradient(45deg, #764ba2, transparent);
+    }
+
+    .bg-shape.shape-3 {
+        width: 150px;
+        height: 150px;
+        top: 50%;
+        left: 10%;
+        background: linear-gradient(45deg, #f093fb, transparent);
+    }
+
+    .bg-shape.shape-4 {
+        width: 100px;
+        height: 100px;
+        bottom: 200px;
+        right: 20%;
+        background: linear-gradient(45deg, #4facfe, transparent);
+    }
+
+    .bg-blur {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        backdrop-filter: blur(100px);
+        -webkit-backdrop-filter: blur(100px);
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Typography */
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0.8));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .gradient-text {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+    }
+
+    .hero-subtitle {
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-description {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.8);
+        max-width: 500px;
+    }
+
+    .highlight-text {
+        color: #667eea;
+        font-weight: 600;
+        position: relative;
+        padding: 0 2px;
+    }
+
+    .highlight-text::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        width: 100%;
+        height: 8px;
+        background: rgba(102, 126, 234, 0.2);
+        z-index: -1;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(102, 126, 234, 0.1);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        color: #667eea;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+    }
+
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: #4ade80;
+        border-radius: 50%;
+        position: relative;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+        }
+    }
+
+    /* Buttons */
+    .hero-buttons .btn {
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-outline-light {
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+    }
+
+    /* Profile Image */
+    .profile-container {
+        position: relative;
+    }
+
+    .profile-image-wrapper {
+        position: relative;
+        width: 350px;
+        height: 350px;
+        margin: 0 auto;
+    }
+
+    .profile-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe) border-box;
+        /* -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude; */
+        animation: profileGlow 3s ease-in-out infinite alternate;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes profileGlow {
+        from {
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+        }
+
+        to {
+            filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.5));
+        }
+    }
+
+    /* Floating Badges */
+    .floating-badge {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .floating-badge.experience {
+        top: 20px;
+        left: 0;
+        animation-delay: 0s;
+    }
+
+    .floating-badge.projects {
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        animation-delay: 2s;
+    }
+
+    .floating-badge.tech {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation-delay: 4s;
+    }
+
+    .floating-badge .badge-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .floating-badge i {
+        color: #667eea;
+        font-size: 1rem;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    /* Tech Stack */
+    .tech-stack {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .tech-stack p {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .tech-icon {
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .tech-icon:hover {
+        color: #667eea;
+        transform: translateY(-5px);
+    }
+
+    .tech-icon[data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .tech-icon:hover::after {
+        opacity: 1;
+        visibility: visible;
+        bottom: 120%;
+    }
+
+    /* Quick Stats */
+    .quick-stats {
+        position: relative;
+    }
+
+    .quick-stats::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+    }
+
+    .scroll-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.7);
+        transition: all 0.3s ease;
+    }
+
+    .scroll-link:hover {
+        color: white;
+    }
+
+    .mouse {
+        width: 30px;
+        height: 50px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .wheel {
+        width: 4px;
+        height: 10px;
+        background: white;
+        border-radius: 2px;
+        margin-top: 10px;
+        animation: scrollWheel 2s infinite;
+    }
+
+    @keyframes scrollWheel {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    }
+
+    .scroll-text {
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* Wave Hand */
+    .wave-hand {
+        display: inline-block;
+        animation: wave 2.5s infinite;
+        transform-origin: 70% 70%;
+        margin-left: 10px;
+    }
+
+    @keyframes wave {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        10% {
+            transform: rotate(14deg);
+        }
+
+        20% {
+            transform: rotate(-8deg);
+        }
+
+        30% {
+            transform: rotate(14deg);
+        }
+
+        40% {
+            transform: rotate(-4deg);
+        }
+
+        50% {
+            transform: rotate(10deg);
+        }
+
+        60% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+
+    /* Typing Animation */
+    .typing-text {
+        position: relative;
+    }
+
+    .typed-cursor {
+        animation: blink 1s infinite;
+        color: #667eea;
+        font-weight: bold;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .hero-title {
+            font-size: 2.8rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+        }
+
+        .profile-image-wrapper {
+            width: 300px;
+            height: 300px;
+        }
+
+        .hero-buttons .btn {
+            padding: 10px 24px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        #hero {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+        }
+
+        .profile-image-wrapper {
+            width: 250px;
+            height: 250px;
+        }
+
+        .floating-badge {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .tech-stack {
+            padding: 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 1.8rem;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .hero-buttons .btn {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .profile-image-wrapper {
+            width: 200px;
+            height: 200px;
+        }
+    }
+</style>
+
+<script>
+    // Typing Animation
+    document.addEventListener('DOMContentLoaded', function () {
+        const typingText = document.querySelector('.typing-text');
+        const textArray = ['Software Engineer', 'Full-Stack Developer', 'Mobile App Developer', 'Problem Solver'];
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100;
+
+        function type() {
+            const currentText = textArray[textIndex];
+
+            if (isDeleting) {
+                typingText.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 50;
+            } else {
+                typingText.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 100;
+            }
+
+            if (!isDeleting && charIndex === currentText.length) {
+                isDeleting = true;
+                typingSpeed = 1500; // Pause at end
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % textArray.length;
+                typingSpeed = 500; // Pause before typing next
+            }
+
+            setTimeout(type, typingSpeed);
+        }
+
+        setTimeout(type, 1000);
+
+        // Add smooth scroll for scroll indicator
+        document.querySelector('.scroll-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
